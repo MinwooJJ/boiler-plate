@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const { User } = require('./models/user');
+const cookieParser = require('cookie-parser');
 const port = 5000;
 
 const config = require('./config/key');
@@ -20,6 +21,7 @@ mongoose
 app.use(express.json());
 // application/x-www-form-urlencoded, form 데이터 해석
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
@@ -35,6 +37,38 @@ app.post('/register', (req, res) => {
     }
 
     return res.status(200).json({ success: true });
+  });
+});
+
+app.post('/login', (req, res) => {
+  User.findOne({ email: req.body.email }, (err, user) => {
+    if (!user) {
+      return res.json({
+        loginSuccess: false,
+        message: 'e-mail does not exist',
+      });
+    }
+
+    user.comparePassword(req.body.password, (err, isMatch) => {
+      if (!isMatch) {
+        return res.json({
+          loginSuccess: false,
+          message: 'Password does not match',
+        });
+      }
+
+      user.generateToken((err, user) => {
+        if (err) {
+          return res.status(400).send(err);
+        }
+
+        // token 저장, cookie or localstorage, 현재 cookie 사용
+        res
+          .cookie('x_auth', user.token)
+          .status(200)
+          .json({ loginSuccess: true, userId: user._id });
+      });
+    });
   });
 });
 
