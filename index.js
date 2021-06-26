@@ -1,24 +1,41 @@
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
-
+const { User } = require('./models/user');
 const port = 5000;
 
+const config = require('./config/key');
+
 mongoose
-  .connect(
-    'mongodb+srv://minwoo:4119694jmw@boilerplate.i1ydx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-      useFindAndModify: false,
-    }
-  )
+  .connect(config.mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+  })
   .then(() => console.log('MongoDB is conneted!'))
   .catch((error) => console.error(error));
 
+// application/json, json 데이터 해석
+app.use(express.json());
+// application/x-www-form-urlencoded, form 데이터 해석
+app.use(express.urlencoded({ extended: true }));
+
 app.get('/', (req, res) => {
   res.send('Hello World!');
+});
+
+app.post('/register', (req, res) => {
+  const user = new User(req.body);
+
+  // client에서 받은 정보들을 user model에 저장
+  user.save((err, userInfo) => {
+    if (err) {
+      return res.json({ success: false, err });
+    }
+
+    return res.status(200).json({ success: true });
+  });
 });
 
 app.listen(port, () => {
