@@ -72,7 +72,7 @@ app.post('/api/users/login', (req, res) => {
 app.get('/api/users/auth', auth, (req, res) => {
   // middleware auth로 부터 req.token, req.user를 받아 옴
   res.status(200).json({
-    _id: req.user_.id,
+    _id: req.user.id,
     isAdmin: req.user.role === 0 ? false : true,
     isAuth: true,
     email: req.user.email,
