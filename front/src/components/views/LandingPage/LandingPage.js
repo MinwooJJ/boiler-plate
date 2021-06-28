@@ -1,14 +1,33 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
 
-function LandingPage() {
-  useEffect(() => {
-    axios.get('/api/hello').then((response) => {
-      console.log(response.data);
+function LandingPage(props) {
+  const onLogoutHandler = () => {
+    axios.get('/api/users/logout').then((response) => {
+      if (response.data.success) {
+        props.history.push('/login');
+        console.log(response);
+      } else {
+        alert('logout failed');
+      }
     });
-  }, []);
+  };
 
-  return <div>LandingPage</div>;
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        height: '100vh',
+      }}
+    >
+      <h2>시작 페이지</h2>
+      <button onClick={onLogoutHandler}>Logout</button>
+    </div>
+  );
 }
 
 export default LandingPage;

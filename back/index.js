@@ -24,10 +24,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.get('/api/hello', (req, res) => {
-  res.send('hello');
-});
-
 app.post('/api/users/register', (req, res) => {
   const user = new User(req.body);
 
